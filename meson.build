@@ -8,5 +8,12 @@ project('morning_shift',
     'default_library=shared'],
   version : '0.0.1')
 
-subdir('src')
+BOOST = dependency(
+    'boost',
+    modules : [
+        'program_options',
+    ],
+    version : ['>=1.72']
+)
 
+subdir('src')
