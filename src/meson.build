@@ -3,6 +3,7 @@ CLIENT_SOURCES = files('main.cpp')
 subdir('config')
 subdir('utils')
 subdir('logs')
+subdir('mc')
 
 client = executable(
   meson.project_name(),
