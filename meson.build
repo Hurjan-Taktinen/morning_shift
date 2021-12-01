@@ -16,4 +16,10 @@ BOOST = dependency(
     version : ['>=1.72']
 )
 
+SPDLOG_PROJ = subproject('spdlog')
+SPDLOG = SPDLOG_PROJ.get_variable('spdlog_dep')
+
+subdir('data')
+subdir('include')
+subdir('external')
 subdir('src')
