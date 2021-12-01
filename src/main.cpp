@@ -6,7 +6,7 @@
 int main(int argc, const char** argv)
 {
     logs::Log::init();
-    LGINFO("HurjanTaktinen presents ... MorningShift version ({}.{}.{})", 4, 2, 0);
+    LGINFO("HurjanTaktinen presents ... morning_shift version ({}.{}.{})", 0, 1, 0);
 
     std::string_view optionalConfigPath;
     if(argc > 1)

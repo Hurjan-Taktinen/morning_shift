@@ -12,8 +12,7 @@ void Config::init(std::string_view optionalConfigPath)
 {
     m_Log = logs::Log::create("Config");
 
-    if(!optionalConfigPath.empty()
-       && std::filesystem::exists(optionalConfigPath))
+    if(!optionalConfigPath.empty() && std::filesystem::exists(optionalConfigPath))
     {
         m_Log->info("Optional config file given ({})", optionalConfigPath);
         m_ConfigFilePath = optionalConfigPath;
