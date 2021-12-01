@@ -1,0 +1,7 @@
+build/
+builddir/
+
+compile_commands.json
+
+subprojects/*
+!subprojects/*.wrap
