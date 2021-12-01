@@ -9,16 +9,11 @@
 
 #include <boost/program_options.hpp>
 
-struct ProgramConf
-{
-    std::string configpath;
-    int numClients = 0;
-};
 
 static auto parse(int argc, const char** argv)
 {
     namespace po = boost::program_options;
-    ProgramConf conf;
+    config::ClientConfig conf;
 
     // Options only from command line
     po::options_description generic("Example:\n"
@@ -28,10 +23,15 @@ static auto parse(int argc, const char** argv)
 
     po::options_description config("Configuration");
 
+    std::string server_ip;
+    int server_port = 0;
+
     // clang-format off
     config.add_options()
         ("config,c", po::value<std::string>(&conf.configpath)->default_value(""), "Specify optional config file path")
-        ("num-clients,n", po::value<int>(&conf.numClients)->default_value(1), "Spawn n clients");
+        ("num-clients,n", po::value<int>(&conf.numClients)->default_value(1), "Spawn n clients")
+        ("ip-address-clients,i", po::value<std::string>(&server_ip)->default_value(""), "Server IP address(ipv4)")
+        ("port,p", po::value<int>(&server_port)->default_value(0), "Server port");
     // clang-format on
 
     // Options read from command line
@@ -50,12 +50,21 @@ static auto parse(int argc, const char** argv)
         return std::make_tuple(true, conf);
     }
 
+    if(!server_ip.empty())
+    {
+        conf.server_ip = server_ip;
+    }
+    if(server_port != 0)
+    {
+        conf.server_port = server_port;
+    }
+
     return std::make_tuple(false, conf);
 }
 
 int main(int argc, const char** argv)
 {
-    const auto [exit, startupConf] = parse(argc, argv);
+    const auto [exit, clientconfig] = parse(argc, argv);
     if(exit)
     {
         return EXIT_SUCCESS;
@@ -64,8 +73,9 @@ int main(int argc, const char** argv)
     logs::Log::init();
     LGINFO("HurjanTaktinen presents ... morning_shift version ({}.{}.{})", 0, 1, 0);
 
-    config::Config::init(startupConf.configpath);
+    config::Config::init(clientconfig.configpath);
 
+    // Read these from either commandline or settings.ini
     std::string address{"127.0.0.1"};
     int port = 25565;
     std::string name{"Komentaja"};

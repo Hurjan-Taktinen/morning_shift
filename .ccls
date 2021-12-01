@@ -9,15 +9,3 @@ c++
 include/
 -I
 external/
--I
-external/gli/
--I
-subprojects/threadpool/include/
--I
-subprojects/entt/single_include/
--I
-subprojects/spdlog-1.8.5/include/
--I
-/usr/include/spdlog/include/
--D
-TRACY_ENABLE
