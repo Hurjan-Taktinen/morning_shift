@@ -62,11 +62,10 @@ jobs:
         # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
         boost_version: 1.76.0
         
-        
-    - run: |
-        echo "$BOOST_ROOT"
-    
-    - name: Meson Build
+   
+    - name: Meson Build    
+      env:
+        BOOST_ROOT: /home/runner/work/morning_shift/morning_shift/boost/boost
       uses: BSFishy/meson-build@v1.0.3
       with:
         action: test
@@ -76,7 +75,6 @@ jobs:
         meson-version: 0.60.0
         ninja-version: 1.10.2
         gcovr-version: 11
-
        
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
