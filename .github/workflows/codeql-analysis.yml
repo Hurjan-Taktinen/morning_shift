@@ -53,8 +53,14 @@ jobs:
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://git.io/JvXDl
 
-    - run: |
-       apt install libboost-dev
+    - name: Install boost
+      uses: MarkusJx/install-boost@v2.0.0
+      id: install-boost
+      with:
+        # REQUIRED: Specify the required boost version
+        # A list of supported versions can be found here: 
+        # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
+        boost_version: 1.76.0
     
     - name: Meson Build
       uses: BSFishy/meson-build@v1.0.3
