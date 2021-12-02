@@ -10,5 +10,5 @@ client = executable(
   sources : CLIENT_SOURCES,
   include_directories : INCLUDE_DIRS,
   link_with : [utils],
-  dependencies : [BOOST, SPDLOG]
+  dependencies : [BOOST, SPDLOG, ZLIB]
 )
