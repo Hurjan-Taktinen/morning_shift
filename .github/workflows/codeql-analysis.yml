@@ -61,6 +61,10 @@ jobs:
         # A list of supported versions can be found here: 
         # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
         boost_version: 1.76.0
+        
+        
+    - run: |
+        echo "$BOOST_ROOT"
     
     - name: Meson Build
       uses: BSFishy/meson-build@v1.0.3
