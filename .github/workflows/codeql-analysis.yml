@@ -53,6 +53,8 @@ jobs:
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://git.io/JvXDl
 
+    - run: |
+       apt install libboost-dev
     
     - name: Meson Build
       uses: BSFishy/meson-build@v1.0.3
