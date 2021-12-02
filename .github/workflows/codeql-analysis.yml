@@ -56,6 +56,15 @@ jobs:
     
     - name: Meson Build
       uses: BSFishy/meson-build@v1.0.3
+      with:
+        action: test
+        directory: build
+        setup-options: -Db_coverage=true
+        options: --verbose
+        meson-version: 0.54.0
+        ninja-version: 1.10.2
+        gcovr-version: 11
+
        
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
