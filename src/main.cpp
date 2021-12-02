@@ -80,9 +80,9 @@ int main(int argc, const char** argv)
     int port = 25565;
     std::string name{"Komentaja"};
 
-    mc::Client client{address, port, name};
-    client.start();
-    client.join();
+    mc::ClientPtr client = mc::Client::create(address, port, name);
+    client->start();
+    client->join();
 
     return EXIT_SUCCESS;
 }

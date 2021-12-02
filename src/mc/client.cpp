@@ -1,40 +1,121 @@
+#include "messages.h"
+#include "messageids.h"
+
 #include "mc/client.h"
+#include "mc/connection.h"
+#include "mc/messagestack.h"
+
 #include <string>
+#include <thread>
 
 namespace mc
 {
-Client::Client(const std::string& addr, int port, const std::string& name) :
+
+class ClientImpl final : public Client, public OwnerCbs
+{
+public:
+    ClientImpl(const std::string& addr, int port, const std::string& name);
+
+    void start() override;
+    void join() override;
+
+    void handleDisconnect() override
+    {
+        _state = DISCONNECTED;
+        m_conn.reset();
+    };
+
+private:
+    void run();
+    void connect();
+    void login();
+    void main();
+
+    std::string m_name;
+    std::string m_addr;
+    int m_port = 0;
+
+    mc::ConnectionPtr m_conn;
+    MessageStack m_stack;
+
+    std::thread m_thread;
+    logs::Logger m_loki;
+};
+
+ClientPtr Client::create(const std::string& addr, const int port, const std::string& name)
+{
+    auto clientPtr = std::make_shared<ClientImpl>(addr, port, name);
+    return std::dynamic_pointer_cast<Client>(clientPtr);
+}
+
+ClientImpl::ClientImpl(const std::string& addr, int port, const std::string& name) :
     m_name(name), m_addr(addr), m_port(port)
 {
     m_loki = logs::Log::create("Client\"" + m_name + "\"");
     m_loki->info("created new client");
 }
 
-void Client::start()
+void ClientImpl::start()
 {
-    m_threadi = std::thread(&Client::run, this);
+    m_thread = std::thread(&ClientImpl::run, this);
 }
-void Client::join()
+void ClientImpl::join()
 {
-    m_threadi.join();
+    m_thread.join();
 }
 
-void Client::run()
+void ClientImpl::run()
 {
     connect();
+    login();
+    main();
 }
 
-void Client::connect()
+void ClientImpl::connect()
 {
-    m_loki->info("connecting {}:{}", m_addr, m_port);
+    if(_state == DISCONNECTED)
+    {
+        m_loki->info("connecting {}:{}", m_addr, m_port);
+
+        m_conn = Connection::create(m_addr, m_port);
+        if(m_conn)
+        {
+            m_loki->info("connected {}:{}", m_addr, m_port);
+            m_stack.setConnection(m_conn);
+            _state = CONNECTED;
+        }
+    }
 }
 
-void Client::login()
+void ClientImpl::login()
 {
+    if(_state == CONNECTED)
+    {
+        _state = LOGIN;
+        m_loki->info("logging in as {}", m_name);
+
+        mc::HandshakeMsg handshake({mc::ProtocolVersion, m_addr, m_port, 0x02});
+        m_stack.send(handshake);
+        mc::LoginStartMsg loginStart{m_name};
+        m_stack.send(loginStart);
+
+        for(;;)
+        {
+            // auto packet = m_conn->receive();
+            // if(packet)
+            //{
+            // m_stack.handlePacket(packet);
+            //}
+        }
+    }
 }
 
-void Client::play()
+void ClientImpl::main()
 {
+    for(;;)
+    {
+        // do things like
+    }
 }
 
 } // namespace mc

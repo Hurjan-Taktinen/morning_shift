@@ -9,26 +9,16 @@
 namespace mc
 {
 
-class Client final
+class Client;
+using ClientPtr = std::shared_ptr<Client>;
+
+class Client
 {
 public:
-    Client(const std::string& addr, const int port, const std::string& name);
-    void start();
-    void join();
+    static ClientPtr create(const std::string& addr, const int port, const std::string& name);
 
-    void run();
-
-private:
-    void connect();
-    void login();
-    void play();
-
-    std::string m_name;
-    std::string m_addr;
-    int m_port = 0;
-
-    std::thread m_threadi;
-
-    logs::Logger m_loki;
+    virtual ~Client() = default;
+    virtual void start() = 0;
+    virtual void join() = 0;
 };
 } // namespace mc

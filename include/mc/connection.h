@@ -1,7 +1,9 @@
-#pragma once
+#ifndef MC_CONNECTION_H
+#define MC_CONNECTION_H
 
-#include <boost/asio.hpp>
+#include <asio.hpp>
 #include <memory>
+#include <optional>
 
 namespace mc
 {
@@ -19,7 +21,7 @@ public:
         return thisPtr;
     }
 
-    bool send() { return true; }
+    bool send(const std::vector<uint8_t>&) { return true; }
     bool receive()
     {
         // get length + rawdata to packet
@@ -51,9 +53,19 @@ public:
     }
 
 private:
-    void connect(const std::string& addr, const int port)
+    void connect(const std::string& addr, const unsigned short port)
     {
+        using asio::ip::tcp;
 
+        asio::io_context io_context;
+        tcp::resolver resolver(io_context);
+        //auto endpoints = resolver.resolve(addr, std::to_string(port));
+        auto ip = asio::ip::address::from_string(addr);
+        asio::ip::tcp::endpoint endpoint{ip, port};
+
+        socket = tcp::socket(io_context);
+
+        socket->connect(endpoint);
     }
 
     size_t getLen()
@@ -80,5 +92,7 @@ private:
     }
 
 private:
+    std::optional<asio::ip::tcp::socket> socket;
 };
 } // namespace mc
+#endif
