@@ -1,1 +1,1 @@
-CLIENT_SOURCES += files('client.cpp')
+CLIENT_SOURCES += files('client.cpp', 'messagestack.cpp')

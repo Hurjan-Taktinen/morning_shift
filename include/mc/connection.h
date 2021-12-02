@@ -4,6 +4,7 @@
 #include <asio.hpp>
 #include <memory>
 #include <optional>
+#include <iostream>
 
 namespace mc
 {
@@ -21,35 +22,47 @@ public:
         return thisPtr;
     }
 
-    bool send(const std::vector<uint8_t>&) { return true; }
-    bool receive()
+    bool send(const std::vector<uint8_t>& packet)
+    {
+        asio::error_code erska;
+        socket->write_some(asio::buffer(packet), erska);
+
+        if(erska)
+            return false;
+
+        return true;
+    }
+
+    bool receive(std::vector<uint8_t>& packet)
     {
         // get length + rawdata to packet
-        // packet.resize(5); // max size of varInt
-        // size_t packetSize = getLen(fd, packet);
-        //// std::cout << "succesfully read packet length=" << packetSize
-        //// << std::endl;
-        // if(packetSize <= 0)
-        // return false;
-        //// std::cout << "packet size=" << packet.size() << " raw[" <<
-        //// packet
-        //// <<
-        //// "]" <<  std::endl;
+        packet.resize(5); // max size of varInt
+        size_t packetSize = getLen(packet);
+        if(packetSize <= 0)
+            return false;
 
-        // size_t receivedCount = 0;
-        // size_t offset = packet.size();
+        // std::cout << "succesfully read packet length=" << packetSize << std::endl;
 
-        // packet.resize(offset + packetSize);
+        size_t offset = packet.size();
+        size_t receivedCount = 0;
+        packet.resize(offset + packetSize);
 
-        // while(receivedCount < packetSize)
-        //{
-        // receivedCount +=
-        // recv(fd,
-        // packet.data() + offset + receivedCount,
-        // packetSize - receivedCount);
-        //}
-        // return true;
-        return false;
+        asio::error_code error;
+
+        while(receivedCount < packetSize)
+        {
+            receivedCount = socket->read_some(
+                    asio::buffer(
+                            &packet.front() + offset + receivedCount, packetSize - receivedCount),
+                    error);
+
+            if(error)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 private:
@@ -59,36 +72,37 @@ private:
 
         asio::io_context io_context;
         tcp::resolver resolver(io_context);
-        //auto endpoints = resolver.resolve(addr, std::to_string(port));
+
         auto ip = asio::ip::address::from_string(addr);
         asio::ip::tcp::endpoint endpoint{ip, port};
 
         socket = tcp::socket(io_context);
-
         socket->connect(endpoint);
     }
 
-    size_t getLen()
+    size_t getLen(std::vector<uint8_t>& packet)
     {
-        // uint32_t tmp = 0;
+        asio::error_code error;
 
-        // int i = 0;
-        // for(i = 0; i < 5; ++i)
-        //{
-        // if(recv(fd, packet.data() + i, sizeof(uint8_t)) != 1)
-        // return 0;
+        uint32_t tmp = 0;
 
-        // uint32_t c = static_cast<uint8_t>(*(packet.data() + i));
+        int i = 0;
+        for(i = 0; i < 5; ++i)
+        {
+            if(asio::read(*socket, asio::buffer(&packet.front() + i, 1), error) != 1)
+            {
+                return 0;
+            }
 
-        // tmp |= ((c & 0x7F) << 7 * i);
+            uint32_t c = packet.at(i);
 
-        // if(!(c & 0x80))
-        // break;
-        //}
-        //// std::cout << "i=" << i+1 << std::endl;
-        // packet.resize(i + 1);
-        // return tmp;
-        return 0;
+            tmp |= ((c & 0x7F) << 7 * i);
+
+            if(!(c & 0x80))
+                break;
+        }
+        packet.resize(i + 1);
+        return tmp;
     }
 
 private:

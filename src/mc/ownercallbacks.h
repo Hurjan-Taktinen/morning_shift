@@ -15,7 +15,7 @@ class OwnerCbs
 {
 public:
     virtual ~OwnerCbs() = default;
-    // virtual void handleMessage(const mc::LoginSuccessMsg&) = 0;
+    virtual void handleMessage(const mc::LoginSuccessMsg&) = 0;
     // virtual void handleMessage(const mc::JoinGameMsg&) = 0;
     // virtual void handleMessage(const mc::PluginMessageMsg&) = 0;
     // virtual void handleMessage(const mc::DifficultyMsg& msg) = 0;

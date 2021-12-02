@@ -85,13 +85,11 @@ void MessageStack::handleLoginMessages(StringArchive& sa, OwnerCbsPtr& owner)
     switch(MessageId(msgId._value))
     {
     case LOGIN_SUCCESS: unpack<LoginSuccessMsg>(owner, sa); return;
-    case DISCONNECT:
-        // owner->handleDisconnect(); return;
-        return;
+    case DISCONNECT: owner->handleDisconnect(); return;
     case SET_COMPRESSION:
         SetCompressionMsg msg(Deserialize<typename SetCompressionMsg::Type>::deserialize(sa));
         setCompression(msg.data()._value);
-        // std::cout << "set compression threshold to " << msg.data()._value << std::endl;
+        std::cout << "set compression threshold to " << msg.data()._value << std::endl;
         return;
     }
 
@@ -198,7 +196,7 @@ void MessageStack::setCompression(int32_t threshold)
 void MessageStack::handleKeepAlive(StringArchive& sa)
 {
     KeepAliveMsg msg = Deserialize<KeepAliveMsg::Type>::deserialize(sa);
-    // std::cout << "KeepAlive " << std::endl;
+    std::cout << "KeepAlive " << std::endl;
     send(msg);
 }
 

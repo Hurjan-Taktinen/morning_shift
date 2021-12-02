@@ -25,6 +25,9 @@ public:
         m_conn.reset();
     };
 
+    void init(OwnerCbsPtr thisPtr) { m_stack.init(thisPtr); }
+
+    void handleMessage(const mc::LoginSuccessMsg&) override;
 private:
     void run();
     void connect();
@@ -45,6 +48,7 @@ private:
 ClientPtr Client::create(const std::string& addr, const int port, const std::string& name)
 {
     auto clientPtr = std::make_shared<ClientImpl>(addr, port, name);
+    clientPtr->init(clientPtr);
     return std::dynamic_pointer_cast<Client>(clientPtr);
 }
 
@@ -101,11 +105,12 @@ void ClientImpl::login()
 
         for(;;)
         {
-            // auto packet = m_conn->receive();
-            // if(packet)
-            //{
-            // m_stack.handlePacket(packet);
-            //}
+            StringArchive packet;
+            if(m_conn->receive(packet))
+            {
+                // m_loki->info("raw[{}]", packet.str());
+                m_stack.handlePacket(packet);
+            }
         }
     }
 }
@@ -115,7 +120,17 @@ void ClientImpl::main()
     for(;;)
     {
         // do things like
+        StringArchive packet;
+        while(m_conn->receive(packet))
+        {
+            m_stack.handlePacket(packet);
+        }
     }
+}
+
+void ClientImpl::handleMessage(const mc::LoginSuccessMsg&)
+{
+    _state = PLAY;
 }
 
 } // namespace mc
