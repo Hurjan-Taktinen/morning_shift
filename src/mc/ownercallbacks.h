@@ -22,7 +22,7 @@ public:
     // virtual void handleMessage(const mc::DeclareRecipesMsg& msg) = 0;
     // virtual void handleMessage(const mc::PlayerAbilitiesMsg& msg) = 0;
     // virtual void handleMessage(const mc::HeldItemChangeMsg& msg) = 0;
-    // virtual void handleMessage(const mc::ChunkDataMsg& msg) = 0;
+     virtual void handleMessage(const mc::ChunkDataMsg& msg) = 0;
     // virtual void handleMessage(const mc::ChatMessageMsg& msg) = 0;
     // virtual void handleMessage(const mc::TimeUpdateMsg& msg) = 0;
     // virtual void handleMessage(const mc::PlayerPositionAndLookMsg& msg) = 0;
@@ -34,12 +34,12 @@ public:
     // virtual void handleMessage(const mc::EntityLookAndRelativeMovementMsg& msg) = 0;
     // virtual void handleMessage(const mc::EntityLookMsg& msg) = 0;
     // virtual void handleMessage(const mc::SpawnPlayerMsg& msg) = 0;
-    //  virtual void handleMessage(const mc::SpawnPositionMsg& msg) = 0;
-    //  virtual void handleMessage(const mc::WorldBorderMsg& msg) = 0;
-    //  virtual void handleMessage(const mc::WindowItemsMsg& msg) = 0;
-    //  virtual void handleMessage(const mc::SetSlotMsg& msg) = 0;
+    // virtual void handleMessage(const mc::SpawnPositionMsg& msg) = 0;
+    // virtual void handleMessage(const mc::WorldBorderMsg& msg) = 0;
+    // virtual void handleMessage(const mc::WindowItemsMsg& msg) = 0;
+    // virtual void handleMessage(const mc::SetSlotMsg& msg) = 0;
 
-    virtual void handleDisconnect() = 0;
+    virtual void handleDisconnect(const std::string& reason) = 0;
     virtual bool compression() const { return false; }
 
     enum State

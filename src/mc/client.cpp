@@ -19,15 +19,17 @@ public:
     void start() override;
     void join() override;
 
-    void handleDisconnect() override
+    void handleDisconnect(const std::string& reason) override
     {
         _state = DISCONNECTED;
-        m_conn.reset();
+        m_loki->info("Disconnected {}", reason);
     };
 
     void init(OwnerCbsPtr thisPtr) { m_stack.init(thisPtr); }
 
     void handleMessage(const mc::LoginSuccessMsg&) override;
+    void handleMessage(const mc::ChunkDataMsg&) override;
+
 private:
     void run();
     void connect();
@@ -131,6 +133,11 @@ void ClientImpl::main()
 void ClientImpl::handleMessage(const mc::LoginSuccessMsg&)
 {
     _state = PLAY;
+}
+
+void ClientImpl::handleMessage(const mc::ChunkDataMsg&)
+{
+    // m_apper->update(msg);
 }
 
 } // namespace mc

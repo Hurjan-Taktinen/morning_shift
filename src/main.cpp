@@ -78,7 +78,7 @@ int main(int argc, const char** argv)
     // Read these from either commandline or settings.ini
     std::string address{"127.0.0.1"};
     int port = 25565;
-    std::string name{"Komentaja"};
+    std::string name{"Komentaja_1"};
 
     mc::ClientPtr client = mc::Client::create(address, port, name);
     client->start();

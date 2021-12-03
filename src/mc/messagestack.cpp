@@ -32,6 +32,16 @@ void MessageStack::handleCompressed(StringArchive& sa, OwnerCbsPtr& owner)
             packetLength._value - get_size(dataLength));
     handleUncompressed(uncomp, owner);
 }
+void MessageStack::disconnect(StringArchive packet)
+{
+    auto owner = _owner.lock();
+    if(owner)
+    {
+        auto msg = Deserialize<DisconnectMsg::Type>::deserialize(packet);
+        std::string reason = std::get<0>(msg).getValue();
+        owner->handleDisconnect(reason);
+    }
+}
 
 bool MessageStack::send(const StringArchive& packet)
 {
@@ -85,7 +95,7 @@ void MessageStack::handleLoginMessages(StringArchive& sa, OwnerCbsPtr& owner)
     switch(MessageId(msgId._value))
     {
     case LOGIN_SUCCESS: unpack<LoginSuccessMsg>(owner, sa); return;
-    case DISCONNECT: owner->handleDisconnect(); return;
+    case DISCONNECT: disconnect(sa); return;
     case SET_COMPRESSION:
         SetCompressionMsg msg(Deserialize<typename SetCompressionMsg::Type>::deserialize(sa));
         setCompression(msg.data()._value);
@@ -99,14 +109,10 @@ void MessageStack::handleLoginMessages(StringArchive& sa, OwnerCbsPtr& owner)
 
 static void logUnhandledMessage(const std::string& str)
 {
-    bool enabled = false;
-    if(enabled)
-    {
-        std::cout << "Received message: " << str << " only logging" << std::endl;
-    }
+    std::cout << "Received message: " << str << std::endl;
 }
 
-void MessageStack::handlePlayMessages(StringArchive& sa, OwnerCbsPtr&)
+void MessageStack::handlePlayMessages(StringArchive& sa, OwnerCbsPtr& owner)
 {
     using namespace ClientBound::Play;
 
@@ -115,28 +121,25 @@ void MessageStack::handlePlayMessages(StringArchive& sa, OwnerCbsPtr&)
     switch(MessageId(msgId._value))
     {
     case KEEP_ALIVE: handleKeepAlive(sa); return;
+    case CHUNK_DATA: unpack<ChunkDataMsg>(owner, sa); return;
 
     case SERVER_DIFFICULTY: logUnhandledMessage("SERVER_DIFFICULTY"); return;
     case PLUGIN_MESSAGE: logUnhandledMessage("PLUGIN_MESSAGE"); return;
     case JOIN_GAME: logUnhandledMessage("JOIN_GAME"); return;
     case PLAYER_ABILITIES: logUnhandledMessage("PLAYER_ABILITIES"); return;
-    case HELD_ITEM_CHANGE: logUnhandledMessage("HELD_ITEM_CHANGE"); return;
+    // case HELD_ITEM_CHANGE: logUnhandledMessage("HELD_ITEM_CHANGE"); return;
     case CHAT_MESSAGE: logUnhandledMessage("CHAT_MESSAGE"); return;
     case TIME_UPDATE: logUnhandledMessage("TIME_UPDATE"); return;
     case PLAYER_POSITION_AND_LOOK: logUnhandledMessage("PLAYER_POSITION_AND_LOOK"); return;
     case DISCONNECT: logUnhandledMessage("DISCONNECT"); return;
-    case CHUNK_DATA: logUnhandledMessage("CHUNK_DATA"); return;
     case PLAYER_INFO: logUnhandledMessage("PLAYER_INFO"); return;
-    case UPDATE_HEALTH: logUnhandledMessage("UPDATE_HEALTH"); return;
+    // case UPDATE_HEALTH: logUnhandledMessage("UPDATE_HEALTH"); return;
     case ENTITY_TELEPORT: logUnhandledMessage("ENTITY_TELEPORT"); return;
-    case ENTITY_RELATIVE_MOVEMENT: logUnhandledMessage("ENTITY_RELATIVE_MOVEMENT"); return;
     case SPAWN_PLAYER: logUnhandledMessage("SPAWN_PLAYER"); return;
-
-    case ENTITY_LOOK_AND_RELATIVE_MOVEMENT:
-        logUnhandledMessage("ENTITY_LOOK_AND_RELATIVE_MOVEMENT");
-        return;
-    case ENTITY_LOOK:
-        logUnhandledMessage("ENTITY_LOOK");
+    case ENTITY_POSITION: logUnhandledMessage("ENTITY_POSITION"); return;
+    case ENTITY_POSITION_AND_ROTATION: logUnhandledMessage("ENTITY_POSITION_AND_ROTATION"); return;
+    case ENTITY_ROTATION:
+        logUnhandledMessage("ENTITY_ROTATION");
         return;
 
         // case SERVER_DIFFICULTY: unpack<DifficultyMsg>(owner, sa); return;
@@ -148,7 +151,6 @@ void MessageStack::handlePlayMessages(StringArchive& sa, OwnerCbsPtr&)
         // case TIME_UPDATE: unpack<TimeUpdateMsg>(owner, sa); return;
         // case PLAYER_POSITION_AND_LOOK: unpack<PlayerPositionAndLookMsg>(owner, sa); return;
         // case DISCONNECT: unpack<DisconnectMsg>(owner, sa); return;
-        // case CHUNK_DATA: unpack<ChunkDataMsg>(owner, sa); return;
         // case PLAYER_INFO: unpack<PlayerInfoMsg>(owner, sa); return;
         // case UPDATE_HEALTH: unpack<UpdateHealthMsg>(owner, sa); return;
         // case ENTITY_TELEPORT: unpack<EntityTeleportMsg>(owner, sa); return;
@@ -164,23 +166,25 @@ void MessageStack::handlePlayMessages(StringArchive& sa, OwnerCbsPtr&)
         //  case SET_SLOT: unpack<SetSlotMsg>(owner, sa); return;
 
     case ENTITY_HEAD_LOOK: logUnhandledMessage("ENTITY_HEAD_LOOK"); return;
-    case ENTITY_VELOCITY: logUnhandledMessage("ENTITY_VELOCITY"); return;
+    // case ENTITY_VELOCITY: logUnhandledMessage("ENTITY_VELOCITY"); return;
     case SPAWN_POSITION: logUnhandledMessage("SPAWN_POSITION"); return;
-    case WORLD_BORDER: logUnhandledMessage("WORLD_BORDER"); return;
+    // case WORLD_BORDER: logUnhandledMessage("WORLD_BORDER"); return;
     case WINDOW_ITEMS: logUnhandledMessage("WINDOW_ITEMS"); return;
     case SET_SLOT: logUnhandledMessage("SET_SLOT"); return;
-    case DECLARE_RECIPES: logUnhandledMessage("DECLARE_RECIPES"); return;
+    // case DECLARE_RECIPES: logUnhandledMessage("DECLARE_RECIPES"); return;
     case ENTITY_STATUS: logUnhandledMessage("ENTITY_STATUS"); return;
     case DECLARE_COMMANDS: logUnhandledMessage("DECLARE_COMMANDS"); return;
     case UNLOCK_RECIPES: logUnhandledMessage("UNLOCK_RECIPES"); return;
     case CHANGE_GAME_STATE: logUnhandledMessage("CHANGE_GAME_STATE"); return;
-    case TAGS: logUnhandledMessage("TAGS"); return;
-    case ADVANCEMENTS: logUnhandledMessage("ADVANCEMENTS"); return;
-    case SET_EXPERIENCE: logUnhandledMessage("SET EXPERIENCE"); return;
-    case UNLOAD_CHUNK: logUnhandledMessage("UNLOAD_CHUNK"); return;
-    case ENTITY_METADATA: logUnhandledMessage("ENTITY_METADATA"); return;
-    case ENTITY_PROPERTIES: logUnhandledMessage("ENTITY_PROPERTIES"); return;
-    case SOUND_EFFECT: logUnhandledMessage("SOUND_EFFECT"); return;
+    // case TAGS: logUnhandledMessage("TAGS"); return;
+    // case ADVANCEMENTS: logUnhandledMessage("ADVANCEMENTS"); return;
+    // case SET_EXPERIENCE: logUnhandledMessage("SET EXPERIENCE"); return;
+    case UNLOAD_CHUNK:
+        logUnhandledMessage("UNLOAD_CHUNK");
+        return;
+        // case ENTITY_METADATA: logUnhandledMessage("ENTITY_METADATA"); return;
+        // case ENTITY_PROPERTIES: logUnhandledMessage("ENTITY_PROPERTIES"); return;
+        // case SOUND_EFFECT: logUnhandledMessage("SOUND_EFFECT"); return;
     }
     // std::ostringstream os;
     // os << "Play: Unknown/unsupported message: id=" << std::hex

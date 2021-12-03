@@ -58,6 +58,7 @@ public:
     void setCompression(int32_t maxLen);
 
 private:
+    void disconnect(StringArchive packet);
     bool send(const StringArchive& packet);
 
     void handleCompressed(StringArchive&, OwnerCbsPtr& owner);
