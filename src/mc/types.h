@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <bitset>
 
 namespace mc
 {
@@ -46,13 +47,37 @@ public:
 
 class Angle : public std::array<uint8_t, 1>
 {
-    auto operator<=>(const Angle& rhs) const = default;
 };
 
 class Bool : public std::array<uint8_t, 1>
 {
-public:
-    auto operator<=>(const Bool& rhs) const = default;
+};
+
+struct Position : public std::array<uint64_t, 1>
+{
+    std::string dump() const
+    {
+        std::bitset<64> bits{this->at(0)};
+        return bits.to_string();
+    }
+
+    int getX() const
+    {
+        std::bitset<26> bits{this->at(0) >> 38};
+        return bits.test(25) ? (bits.to_ulong() + 0xFFFFFFFFFC000000) : bits.to_ulong();
+    }
+
+    int getY() const
+    {
+        std::bitset<12> bits{this->at(0)};
+        return bits.test(11) ? (bits.to_ulong() + 0xFFFFFFFFFFFFF000) : bits.to_ulong();
+    }
+
+    int getZ() const
+    {
+        std::bitset<26> bits{this->at(0) << 26 >> 38};
+        return bits.test(25) ? (bits.to_ulong() + 0xFFFFFFFFFC000000) : bits.to_ulong();
+    }
 };
 
 class VarInt
@@ -99,8 +124,8 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const ByteArray& bArr)
     {
-        os << "bArr: size=" << bArr.size() << std::hex << std::setw(2)
-           << std::setfill('0') << " data=[";
+        os << "bArr: size=" << bArr.size() << std::hex << std::setw(2) << std::setfill('0')
+           << " data=[";
         for(const auto& item : bArr._v)
             os << static_cast<int>(item);
         os << "]";
@@ -116,14 +141,15 @@ public:
     std::vector<uint8_t> _v;
 };
 
-template <typename TYPE> class Vector : public std::vector<TYPE>
+template<typename TYPE>
+class Vector : public std::vector<TYPE>
 {
     auto operator<=>(const Vector<TYPE>& rhs) const = default;
 
     friend std::ostream& operator<<(std::ostream& os, const Vector<TYPE>& bArr)
     {
-        os << "bArr: size=" << bArr.size() << std::hex << std::setw(2)
-           << std::setfill('0') << " data=[";
+        os << "bArr: size=" << bArr.size() << std::hex << std::setw(2) << std::setfill('0')
+           << " data=[";
         for(const auto& item : bArr)
             os << item;
         os << "]";

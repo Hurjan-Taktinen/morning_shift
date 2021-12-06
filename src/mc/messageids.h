@@ -33,7 +33,7 @@ namespace ClientBound
             // 0x08 	Block Break Animation
             // 0x09 	Update Block Entity
             // 0x0A 	Block Action
-            // 0x0B 	Block Change
+            BLOCK_CHANGE = 0x0C,// 0x0C 	Block Change
             // 0x0C 	Boss Bar
             SERVER_DIFFICULTY = 0x0E, // 0x0D 	Server Difficulty
             CHAT_MESSAGE = 0x0F, // 0x0E 	Chat Message (clientbound)

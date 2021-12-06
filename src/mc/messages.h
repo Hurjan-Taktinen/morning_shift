@@ -89,6 +89,15 @@ public:
     ChunkDataMsg(const ChunkDataType& t) : MessageBase(ClientBound::Play::CHUNK_DATA, t) {}
 };
 
+using BlockChangeType = std::tuple<Position, VarInt>;
+class BlockChangeMsg final : public MessageBase<BlockChangeType>
+{
+public:
+    BlockChangeMsg() : MessageBase(ClientBound::Play::BLOCK_CHANGE) {}
+    BlockChangeMsg(const BlockChangeType& t) : MessageBase(ClientBound::Play::BLOCK_CHANGE, t) {}
+};
+
+
 using KeepAliveType = int64_t;
 class KeepAliveMsg final : public MessageBase<KeepAliveType>
 {

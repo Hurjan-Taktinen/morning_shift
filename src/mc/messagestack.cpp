@@ -122,6 +122,7 @@ void MessageStack::handlePlayMessages(StringArchive& sa, OwnerCbsPtr& owner)
     {
     case KEEP_ALIVE: handleKeepAlive(sa); return;
     case CHUNK_DATA: unpack<ChunkDataMsg>(owner, sa); return;
+    case BLOCK_CHANGE: unpack<BlockChangeMsg>(owner, sa); return;
 
     case SERVER_DIFFICULTY: logUnhandledMessage("SERVER_DIFFICULTY"); return;
     case PLUGIN_MESSAGE: logUnhandledMessage("PLUGIN_MESSAGE"); return;

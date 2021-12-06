@@ -22,6 +22,7 @@ public:
     // virtual void handleMessage(const mc::DeclareRecipesMsg& msg) = 0;
     // virtual void handleMessage(const mc::PlayerAbilitiesMsg& msg) = 0;
     // virtual void handleMessage(const mc::HeldItemChangeMsg& msg) = 0;
+     virtual void handleMessage(const mc::BlockChangeMsg& msg) = 0;
      virtual void handleMessage(const mc::ChunkDataMsg& msg) = 0;
     // virtual void handleMessage(const mc::ChatMessageMsg& msg) = 0;
     // virtual void handleMessage(const mc::TimeUpdateMsg& msg) = 0;

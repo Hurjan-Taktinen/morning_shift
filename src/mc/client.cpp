@@ -29,6 +29,7 @@ public:
 
     void handleMessage(const mc::LoginSuccessMsg&) override;
     void handleMessage(const mc::ChunkDataMsg&) override;
+    void handleMessage(const mc::BlockChangeMsg&) override;
 
 private:
     void run();
@@ -137,7 +138,12 @@ void ClientImpl::handleMessage(const mc::LoginSuccessMsg&)
 
 void ClientImpl::handleMessage(const mc::ChunkDataMsg&)
 {
-    // m_apper->update(msg);
+    // m_apper.update(msg);
+}
+
+void ClientImpl::handleMessage(const mc::BlockChangeMsg&)
+{
+    // m_apper.update(msg);
 }
 
 } // namespace mc
