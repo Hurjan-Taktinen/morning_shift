@@ -1,7 +1,9 @@
 #ifndef SERIALIZATION_H
 #define SERIALIZATION_H
 
+#include "nbt.h"
 #include "types.h"
+
 #include <algorithm>
 #include <numeric>
 #include <cassert>
@@ -437,6 +439,17 @@ struct Deserialize<mc::ByteArrayEnd>
         }
 
         return bEnd;
+    }
+};
+
+template <>
+struct Deserialize<mc::Nbt>
+{
+    template <typename ARCHIVE>
+    static mc::Nbt deserialize(ARCHIVE& a)
+    {
+        mc::Nbt nbt = mc::Nbt::unpackNtb(a);
+        return nbt;
     }
 };
 

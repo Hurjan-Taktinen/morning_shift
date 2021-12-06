@@ -1,12 +1,13 @@
 #pragma once
 
+#include "stringarchive.h"
+
 #include <iostream>
 #include <vector>
 #include <sstream>
 
 #include <numeric>
 #include <concepts>
-#include <byteswap.h>
 #include <variant>
 #include <map>
 
@@ -139,81 +140,71 @@ inline std::string printCombo(const NbtCompound& combo)
     return ss.str();
 }
 
-inline auto bswap(uint8_t b)
-{
-    return b;
-}
-inline auto bswap(uint16_t b)
-{
-    return bswap_16(b);
-}
-inline auto bswap(uint32_t b)
-{
-    return bswap_32(b);
-}
-inline auto bswap(uint64_t b)
-{
-    return bswap_64(b);
-}
-
 template<std::integral T>
-inline auto unpack(std::istream& is)
+inline auto unpack(StringArchive& packet)
 {
     T val;
-    is.read(reinterpret_cast<char*>(&val), sizeof(val));
-    return bswap(val);
+    uint8_t* ptr = reinterpret_cast<uint8_t*>(&val);
+    std::reverse_copy(packet.resumeRead(), packet.resumeRead() + sizeof(val), ptr);
+    packet.addReadOffset(sizeof(val));
+    return val;
 }
 
-inline auto unpackString(std::istream& is)
+inline auto unpackString(StringArchive& packet)
 {
-    auto size = unpack<uint16_t>(is);
+    auto size = unpack<uint16_t>(packet);
     std::string s;
     s.resize(size);
-    is.read(s.data(), size);
+    //is.read(s.data(), size);
+    std::copy(packet.resumeRead(), packet.resumeRead() + size, s.begin());
+    packet.addReadOffset(size);
     return s;
 }
 
 template<typename BASE>
-inline std::vector<BASE> unpackVector(std::istream& is)
+inline std::vector<BASE> unpackVector(StringArchive& packet)
 {
-    auto size = unpack<uint32_t>(is);
+    auto size = unpack<uint32_t>(packet);
     std::vector<BASE> vec(size);
-    is.read(reinterpret_cast<char*>(vec.data()), size * sizeof(BASE));
+    for(uint32_t i = 0; i < size; ++i)
+    {
+        vec.push_back(unpack<BASE>(packet));
+    }
     return vec;
 }
 
-inline ListTag unpackList(std::istream& is)
+inline ListTag unpackList(StringArchive&)
 {
     ListTag list;
 
     return list;
 }
 
-inline NbtCompound unpackCombo(std::istream& is)
+inline NbtCompound unpackCombo(StringArchive& packet)
 {
     NbtCompound combo;
-    combo.name = unpackString(is);
+    combo.name = unpackString(packet);
 
-    auto tag = unpack<uint8_t>(is);
-    for(; tag != TAG_End; tag = unpack<uint8_t>(is))
+    auto tag = unpack<uint8_t>(packet);
+    for(; tag != TAG_End; tag = unpack<uint8_t>(packet))
     {
-        auto name = unpackString(is);
+        auto name = unpackString(packet);
         auto& element = combo.data[name];
         switch(tag)
         {
         case TAG_End: break;
-        case TAG_Byte: element = unpack<uint8_t>(is); break;
-        case TAG_Short: element = unpack<uint16_t>(is); break;
-        case TAG_Int: element = unpack<uint32_t>(is); break;
-        case TAG_Long: element = unpack<uint64_t>(is); break;
-        case TAG_Float: element = unpack<uint32_t>(is); break;
-        case TAG_Double: element = unpack<uint64_t>(is); break;
-        case TAG_Byte_Array: element = unpackVector<uint8_t>(is); break;
-        case TAG_String: element = unpackString(is); break;
-        case TAG_List: element = unpackList(is); break;
-        case TAG_Compound: element = unpackCombo(is); break;
-        case TAG_Int_Array: element = unpackVector<uint32_t>(is); break;
-        case TAG_Long_Array: element = unpackVector<uint64_t>(is); break;
+        case TAG_Byte: element = unpack<uint8_t>(packet); break;
+        case TAG_Short: element = unpack<uint16_t>(packet); break;
+        case TAG_Int: element = unpack<uint32_t>(packet); break;
+        case TAG_Long: element = unpack<uint64_t>(packet); break;
+        case TAG_Float: element = unpack<uint32_t>(packet); break;
+        case TAG_Double: element = unpack<uint64_t>(packet); break;
+        case TAG_Byte_Array: element = unpackVector<uint8_t>(packet); break;
+        case TAG_String: element = unpackString(packet); break;
+        case TAG_List: element = unpackList(packet); break;
+        case TAG_Compound: element = unpackCombo(packet); break;
+        case TAG_Int_Array: element = unpackVector<uint32_t>(packet); break;
+        case TAG_Long_Array: element = unpackVector<uint64_t>(packet); break;
         }
     }
 
@@ -222,14 +213,14 @@ inline NbtCompound unpackCombo(std::istream& is)
 
 struct Nbt
 {
-    static Nbt unpackNtb(std::istream& is)
+    static Nbt unpackNtb(StringArchive& packet)
     {
         Nbt nbt;
 
-        auto tag = unpack<uint8_t>(is);
+        auto tag = unpack<uint8_t>(packet);
         if(tag == 0x0a)
         {
-            nbt.combo = unpackCombo(is);
+            nbt.combo = unpackCombo(packet);
         }
         return nbt;
     }
@@ -239,4 +230,4 @@ struct Nbt
     std::string print() { return printCombo(combo); }
 };
 
-} // namespace mc::nbt
+} // namespace mc

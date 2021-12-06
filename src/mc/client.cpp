@@ -1,5 +1,6 @@
 #include "messages.h"
 #include "messageids.h"
+#include "cartographer.h"
 
 #include "mc/client.h"
 #include "mc/connection.h"
@@ -46,6 +47,8 @@ private:
 
     std::thread m_thread;
     logs::Logger m_loki;
+
+    Cartographer m_apper;
 };
 
 ClientPtr Client::create(const std::string& addr, const int port, const std::string& name)
@@ -60,6 +63,7 @@ ClientImpl::ClientImpl(const std::string& addr, int port, const std::string& nam
 {
     m_loki = logs::Log::create("Client\"" + m_name + "\"");
     m_loki->info("created new client");
+    m_apper.init(m_loki);
 }
 
 void ClientImpl::start()
@@ -136,14 +140,14 @@ void ClientImpl::handleMessage(const mc::LoginSuccessMsg&)
     _state = PLAY;
 }
 
-void ClientImpl::handleMessage(const mc::ChunkDataMsg&)
+void ClientImpl::handleMessage(const mc::ChunkDataMsg& msg)
 {
-    // m_apper.update(msg);
+     m_apper.update(msg);
 }
 
-void ClientImpl::handleMessage(const mc::BlockChangeMsg&)
+void ClientImpl::handleMessage(const mc::BlockChangeMsg& msg)
 {
-    // m_apper.update(msg);
+     m_apper.update(msg);
 }
 
 } // namespace mc

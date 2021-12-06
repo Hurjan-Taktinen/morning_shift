@@ -157,10 +157,6 @@ class Vector : public std::vector<TYPE>
     }
 };
 
-class NbtTag
-{
-};
-
 // template<class T>
 // class Array
 // {

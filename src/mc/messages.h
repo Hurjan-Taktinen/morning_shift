@@ -1,6 +1,7 @@
 #ifndef MESSAGES_H
 #define MESSAGES_H
 
+#include "nbt.h"
 #include "messageids.h"
 #include "types.h"
 
@@ -81,7 +82,7 @@ public:
     JoinGameMsg(const JoinGameType& t) : MessageBase(ClientBound::Play::JOIN_GAME, t) {}
 };
 
-using ChunkDataType = std::tuple<int32_t, int32_t, ByteArrayEnd>;
+using ChunkDataType = std::tuple<int32_t, int32_t, Nbt, ByteArray, ByteArrayEnd>;
 class ChunkDataMsg final : public MessageBase<ChunkDataType>
 {
 public:
