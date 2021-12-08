@@ -110,13 +110,18 @@ void ClientImpl::login()
         mc::LoginStartMsg loginStart{m_name};
         m_stack.send(loginStart);
 
-        for(;;)
+        while(_state == LOGIN)
         {
             StringArchive packet;
             if(m_conn->receive(packet))
             {
-                // m_loki->info("raw[{}]", packet.str());
+                //m_loki->info("raw[{}]", packet.str());
                 m_stack.handlePacket(packet);
+            }
+            else
+            {
+                handleDisconnect("Timed out");
+                break;
             }
         }
     }
@@ -128,26 +133,35 @@ void ClientImpl::main()
     {
         // do things like
         StringArchive packet;
-        while(m_conn->receive(packet))
+        if(m_conn->receive(packet))
         {
+            //m_loki->info("raw[{}]", packet.str());
             m_stack.handlePacket(packet);
+        }
+        else
+        {
+            handleDisconnect("Timed out");
+            break;
         }
     }
 }
 
-void ClientImpl::handleMessage(const mc::LoginSuccessMsg&)
+void ClientImpl::handleMessage(const mc::LoginSuccessMsg& msg)
 {
+    auto [uuid, name] = msg.data();
+
+    m_loki->info("logged in as {} UUID={}", name.str(), uuid.print());
     _state = PLAY;
 }
 
 void ClientImpl::handleMessage(const mc::ChunkDataMsg& msg)
 {
-     m_apper.update(msg);
+    m_apper.update(msg);
 }
 
 void ClientImpl::handleMessage(const mc::BlockChangeMsg& msg)
 {
-     m_apper.update(msg);
+    m_apper.update(msg);
 }
 
 } // namespace mc
