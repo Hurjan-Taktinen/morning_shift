@@ -37,7 +37,7 @@ bool Connection::receive(std::vector<uint8_t>& packet)
 
     while(receivedCount < packetSize)
     {
-        receivedCount = socket->read_some(
+        receivedCount += socket->read_some(
                 asio::buffer(&packet.front() + offset + receivedCount, packetSize - receivedCount),
                 error);
 
