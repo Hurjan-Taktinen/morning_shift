@@ -14,13 +14,13 @@ struct ClientConfig
     std::string configpath;
     int numClients = 0;
     std::optional<std::string> server_ip;
-    std::optional<int> server_port = 0;
+    std::optional<int> server_port;
 };
 
 struct ConnectionConfig
 {
-    std::string server_ip;
-    int server_port = 0;
+    std::string server_ip = "localhost";
+    int server_port = 25565;
 };
 
 class Config final
