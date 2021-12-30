@@ -7,8 +7,9 @@
 #include "serialization.h"
 #include "stringarchive.h"
 #include "ownercallbacks.h"
+#include "network/session.h"
 
-#include "mc/connection.h"
+// #include "mc/connection.h"
 
 #include <memory>
 
@@ -21,7 +22,7 @@ class MessageStack final
 {
 public:
     void init(const mc::OwnerCbsPtr& owner) { _owner = owner; }
-    void setConnection(const ConnectionPtr conn) { m_conn = conn; }
+    void setConnection(const std::shared_ptr<net::Session>& conn) { m_connection = conn; }
 
     template<typename... Ts>
     bool send(const MessageBase<Ts...>& msg)
@@ -36,7 +37,7 @@ public:
             assert(length._value < _threshold);
 
             VarInt compDataLen(0);
-            length._value += get_size(compDataLen);
+            length._value += static_cast<int>(get_size(compDataLen));
             serialize(sa, length);
             serialize(sa, compDataLen);
             serialize(sa, msg.getId());
@@ -71,7 +72,7 @@ private:
     int32_t _threshold = 0;
 
     OwnerCbsWPtr _owner;
-    ConnectionPtr m_conn;
+    std::shared_ptr<net::Session> m_connection;
 };
 } // namespace mc
 #endif

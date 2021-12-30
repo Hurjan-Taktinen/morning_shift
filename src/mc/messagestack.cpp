@@ -4,6 +4,7 @@
 #include "mc/connection.h"
 
 #include <cassert>
+#include <cstdint>
 #include <zlib.h>
 
 namespace mc
@@ -11,7 +12,6 @@ namespace mc
 
 void MessageStack::handleCompressed(StringArchive& sa, OwnerCbsPtr& owner)
 {
-    VarInt packetLength = Deserialize<VarInt>::deserialize(sa);
     VarInt dataLength = Deserialize<VarInt>::deserialize(sa);
 
     if(dataLength._value == 0) // uncompressed
@@ -23,13 +23,13 @@ void MessageStack::handleCompressed(StringArchive& sa, OwnerCbsPtr& owner)
     StringArchive uncomp;
     uncomp.resize(dataLength._value);
 
-    uLong compressedSize = static_cast<uLong>(dataLength._value);
+    auto compressedSize = static_cast<uLong>(dataLength._value);
 
     uncompress(
             (Bytef*)uncomp.data(),
             &compressedSize,
             (Bytef*)sa.data() + sa._readOffset,
-            packetLength._value - get_size(dataLength));
+            sa.size() - get_size(dataLength));
     handleUncompressed(uncomp, owner);
 }
 void MessageStack::disconnect(StringArchive packet)
@@ -45,9 +45,10 @@ void MessageStack::disconnect(StringArchive packet)
 
 bool MessageStack::send(const StringArchive& packet)
 {
-    if(m_conn)
+    if(m_connection)
     {
-        return m_conn->send(packet);
+        std::vector<uint8_t> msg(packet.begin(), packet.end());
+        m_connection->send(std::move(msg));
     }
     return false;
 }
@@ -63,9 +64,7 @@ void MessageStack::handlePacket(StringArchive sa)
     }
     else
     {
-        // consume packet len. it is not needed anymore
-        if(Deserialize<VarInt>::deserialize(sa)._value > 0)
-            handleUncompressed(sa, owner);
+        handleUncompressed(sa, owner);
     }
 }
 
@@ -73,10 +72,10 @@ void MessageStack::handleUncompressed(StringArchive& sa, OwnerCbsPtr& owner)
 {
     switch(owner->getState())
     {
-    case OwnerCbs::DISCONNECTED: break;
-    case OwnerCbs::CONNECTED: break;
-    case OwnerCbs::LOGIN: handleLoginMessages(sa, owner); break;
-    case OwnerCbs::PLAY: handlePlayMessages(sa, owner); break;
+    case OwnerCbs::State::DISCONNECTED: break;
+    case OwnerCbs::State::CONNECTED: break;
+    case OwnerCbs::State::LOGIN: handleLoginMessages(sa, owner); break;
+    case OwnerCbs::State::PLAY: handlePlayMessages(sa, owner); break;
     }
 }
 

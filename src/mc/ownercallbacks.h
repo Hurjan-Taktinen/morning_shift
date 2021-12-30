@@ -41,9 +41,9 @@ public:
     // virtual void handleMessage(const mc::SetSlotMsg& msg) = 0;
 
     virtual void handleDisconnect(const std::string& reason) = 0;
-    virtual bool compression() const { return false; }
+    [[nodiscard]] virtual bool compression() const { return false; }
 
-    enum State
+    enum struct State
     {
         DISCONNECTED,
         CONNECTED,
@@ -51,9 +51,10 @@ public:
         PLAY
     };
 
-    State getState() const { return _state; }
+    [[nodiscard]] State getState() const { return m_state; }
 
-    State _state = DISCONNECTED;
+protected:
+    State m_state = State::DISCONNECTED;
 };
 } // namespace mc
 

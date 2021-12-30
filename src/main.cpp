@@ -2,6 +2,8 @@
 #include "logs/log.h"
 #include "mc/client.h"
 
+#include "application.h"
+
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -73,16 +75,14 @@ int main(int argc, const char** argv)
     LGINFO("HurjanTaktinen presents ... morning_shift version ({}.{}.{})", 0, 1, 0);
 
     config::Config::init(clientconfig.configpath);
+    auto c = config::Config::getConnectionConfig();
 
-    // Read these from either commandline or settings.ini
-    std::string name{"Komentaja_1"};
+    auto app = app::Application{};
+    app.run();
 
-    mc::ClientPtr client = mc::Client::create(
-            config::Config::getConnectionConfig().server_ip,
-            config::Config::getConnectionConfig().server_port,
-            name);
-    client->start();
-    client->join();
+    // mc::ClientPtr client = mc::Client::create(c.server_ip, c.server_port, "Karen");
+    // client->start();
+    // client->join();
 
     return EXIT_SUCCESS;
 }
