@@ -9,8 +9,6 @@
 #include "ownercallbacks.h"
 #include "network/session.h"
 
-// #include "mc/connection.h"
-
 #include <memory>
 
 namespace mc

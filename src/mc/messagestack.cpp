@@ -1,7 +1,6 @@
 #include "messagestack.h"
 #include "serialization.h"
 #include "stringarchive.h"
-#include "mc/connection.h"
 
 #include <cassert>
 #include <cstdint>
