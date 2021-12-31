@@ -17,7 +17,7 @@ class ConnectionProvider final
 {
 public:
     ConnectionProvider();
-    void init();
+    void launch();
 
     void stop()
     {

@@ -19,11 +19,10 @@ void Application::init()
 {
     m_log = logs::Log::create("Application");
     m_connectionProvider = std::make_unique<net::ConnectionProvider>();
-    m_connectionProvider->init();
     auto conf = config::Config::getConnectionConfig();
 
     {
-        m_client = mc::Client::create("Karen");
+        m_client = mc::Client::create("Kone-Person");
         m_connectionProvider->connectSession(
                 conf.server_ip,
                 conf.server_port,
@@ -31,6 +30,9 @@ void Application::init()
                     client->start(std::move(session));
                 });
     }
+
+    // Launch after setting connections to clients
+    m_connectionProvider->launch();
 }
 
 void Application::run()

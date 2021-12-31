@@ -7,8 +7,9 @@
 namespace net
 {
 
-void ConnectionProvider::init()
+void ConnectionProvider::launch()
 {
+    m_contextThread = std::thread([this] { m_ioContext.run(); });
 }
 
 ConnectionProvider::ConnectionProvider()
@@ -21,8 +22,6 @@ void ConnectionProvider::connectSession(std::string const& host, int port, onCon
     using namespace asio::ip;
     auto session = std::make_shared<Session>(m_ioContext, host, port);
     session->connect(std::move(handler));
-
-    m_contextThread = std::thread([this] { m_ioContext.run(); });
 }
 
 } // namespace net

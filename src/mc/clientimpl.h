@@ -5,7 +5,6 @@
 
 #include "mc/cartographer.h"
 #include "mc/client.h"
-// #include "mc/connection.h"
 #include "messagestack.h"
 #include "network/tsdeque.h"
 
@@ -36,7 +35,6 @@ private:
 
     std::string m_name;
 
-    // mc::ConnectionPtr m_conn;
     MessageStack m_stack;
 
     logs::Logger m_loki;
