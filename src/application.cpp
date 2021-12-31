@@ -26,7 +26,7 @@ void Application::init()
         m_clients.emplace_back(mc::Client::create("Kone-Person-" + std::to_string(i)));
         auto& client = m_clients.back();
 
-        m_connectionProvider->connectSession(
+        m_connectionProvider->startSession(
                 conf.server_ip,
                 conf.server_port,
                 [client = client](std::shared_ptr<net::Session> session) {

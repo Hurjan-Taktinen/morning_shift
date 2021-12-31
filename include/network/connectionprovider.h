@@ -25,7 +25,7 @@ public:
         m_contextThread.join();
     }
 
-    void connectSession(std::string const& host, int port, onConnect&& handler);
+    void startSession(std::string const& host, int port, onConnect&& handler);
 
 private:
     logs::Logger m_log;
