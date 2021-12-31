@@ -21,13 +21,14 @@ private:
 
     std::unique_ptr<net::ConnectionProvider> m_connectionProvider;
     logs::Logger m_log;
-    mc::ClientPtr m_client;
+
+    std::vector<mc::ClientPtr> m_clients;
 
     // Total runtime of application
-    float m_apprunTime = 0.0f;
+    float m_apprunTime = 0.0F;
 
     // Total time taken by one cycle of mainloop
-    float m_frameTime = 0.0f;
+    float m_frameTime = 0.0F;
 
     uint64_t m_frameCounter = 0;
 

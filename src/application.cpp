@@ -21,12 +21,15 @@ void Application::init()
     m_connectionProvider = std::make_unique<net::ConnectionProvider>();
     auto conf = config::Config::getConnectionConfig();
 
+    for(int i = 0; i < 1; ++i)
     {
-        m_client = mc::Client::create("Kone-Person");
+        m_clients.emplace_back(mc::Client::create("Kone-Person-" + std::to_string(i)));
+        auto& client = m_clients.back();
+
         m_connectionProvider->connectSession(
                 conf.server_ip,
                 conf.server_port,
-                [client = m_client](std::shared_ptr<net::Session> session) {
+                [client = client](std::shared_ptr<net::Session> session) {
                     client->start(std::move(session));
                 });
     }
@@ -49,7 +52,11 @@ void Application::mainloop()
     while(true)
     {
         utils::Timer timer;
-        m_client->update();
+
+        for(auto const& client : m_clients)
+        {
+            client->update();
+        }
 
         std::this_thread::sleep_for(30ms);
 
