@@ -2,6 +2,7 @@
 #include "mc/stringarchive.h"
 
 #include <cassert>
+#include <cstdint>
 
 namespace mc
 {

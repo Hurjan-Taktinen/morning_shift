@@ -1,5 +1,6 @@
 #include "network/session.h"
 
+#include <cstddef>
 #include <cstdint>
 #include <sstream>
 #include <sys/types.h>
@@ -22,7 +23,7 @@ void Session::send(std::vector<uint8_t>&& msg)
         auto idle = m_outgoing.empty();
         m_outgoing.push(std::move(msg));
 
-        if(!idle)
+        if(idle)
         {
             asyncWrite();
         }
@@ -60,13 +61,13 @@ void Session::asyncWrite()
                 }
                 else
                 {
+                    m_onError(error.message() + "| FROM asyncWrite");
                     m_socket.close();
-                    m_onError(error.message());
                 }
             });
 }
 
-void Session::onReadHeader(asio::error_code error, std::size_t /*bytesTransferred*/)
+void Session::onReadHeader(asio::error_code error, std::size_t bytesTransferred)
 {
     if(!error)
     {
@@ -87,8 +88,10 @@ void Session::onReadHeader(asio::error_code error, std::size_t /*bytesTransferre
     }
     else
     {
+        m_onError(
+                error.message() + "| FROM onReadHeader | READ " + std::to_string(bytesTransferred)
+                + " bytes");
         m_socket.close(error);
-        m_onError(error.message());
     }
 }
 
@@ -107,8 +110,8 @@ void Session::onReadBody(asio::error_code error, std::size_t /*bytesTransferred*
     }
     else
     {
+        m_onError(error.message() + "| FROM onReadBody");
         m_socket.close(error);
-        m_onError(error.message());
     }
 }
 
@@ -124,8 +127,8 @@ void Session::onWrite(asio::error_code error, std::size_t /*unused*/)
     }
     else
     {
+        m_onError(error.message() + "| FROM onWrite");
         m_socket.close();
-        m_onError(error.message());
     }
 }
 

@@ -119,6 +119,7 @@ void MessageStack::handlePlayMessages(StringArchive& sa, OwnerCbsPtr& owner)
     switch(MessageId(msgId._value))
     {
     case KEEP_ALIVE: handleKeepAlive(sa); return;
+    case DISCONNECT: disconnect(sa); return;
     case CHUNK_DATA: unpack<ChunkDataMsg>(owner, sa); return;
     case BLOCK_CHANGE: unpack<BlockChangeMsg>(owner, sa); return;
 
@@ -130,7 +131,6 @@ void MessageStack::handlePlayMessages(StringArchive& sa, OwnerCbsPtr& owner)
     case CHAT_MESSAGE: logUnhandledMessage("CHAT_MESSAGE"); return;
     case TIME_UPDATE: logUnhandledMessage("TIME_UPDATE"); return;
     case PLAYER_POSITION_AND_LOOK: logUnhandledMessage("PLAYER_POSITION_AND_LOOK"); return;
-    case DISCONNECT: logUnhandledMessage("DISCONNECT"); return;
     case PLAYER_INFO: logUnhandledMessage("PLAYER_INFO"); return;
     // case UPDATE_HEALTH: logUnhandledMessage("UPDATE_HEALTH"); return;
     case ENTITY_TELEPORT: logUnhandledMessage("ENTITY_TELEPORT"); return;

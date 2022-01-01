@@ -18,12 +18,7 @@ class ConnectionProvider final
 public:
     ConnectionProvider();
     void launch();
-
-    void stop()
-    {
-        m_ioContext.stop();
-        m_contextThread.join();
-    }
+    void stop();
 
     void startSession(std::string const& host, int port, onConnect&& handler);
 
