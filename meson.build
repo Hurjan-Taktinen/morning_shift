@@ -19,6 +19,14 @@ BOOST = dependency(
 SPDLOG = subproject('spdlog').get_variable('spdlog_dep')
 CATCH2 = subproject('catch2').get_variable('catch2_dep')
 ZLIB = subproject('zlib').get_variable('zlib_dep')
+THREAD = dependency('threads')
+
+add_project_arguments(
+    [
+        # '-DASIO_ENABLE_HANDLER_TRACKING',
+    ],
+    language : ['cpp']
+)
 
 subdir('data')
 subdir('include')

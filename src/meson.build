@@ -1,14 +1,18 @@
-CLIENT_SOURCES = files('main.cpp')
+CLIENT_SOURCES = files(
+  'main.cpp',
+  'application.cpp')
 
 subdir('config')
-subdir('utils')
 subdir('logs')
 subdir('mc')
+subdir('network')
+subdir('utils')
 
 client = executable(
   meson.project_name(),
   sources : CLIENT_SOURCES,
   include_directories : INCLUDE_DIRS,
   link_with : [utils],
-  dependencies : [BOOST, SPDLOG, ZLIB]
+  dependencies : [THREAD, BOOST, SPDLOG, ZLIB],
+  link_args : '-lfmt'
 )

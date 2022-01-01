@@ -10,7 +10,7 @@ class StringArchive : public std::vector<uint8_t>
 {
 public:
     StringArchive() = default;
-    StringArchive(const std::string& packet)
+    explicit StringArchive(const std::string& packet)
     {
         size_t len = packet.length();
         assert((len % 2) == 0);
@@ -21,7 +21,7 @@ public:
             push_back(x);
         }
     }
-    StringArchive(std::vector<uint8_t>&& vec) : vector<uint8_t>{std::move(vec)} {}
+    explicit StringArchive(std::vector<uint8_t>&& vec) : vector<uint8_t>{std::move(vec)} {}
 
     friend std::ostream& operator<<(std::ostream& os, const StringArchive& sa)
     {
@@ -32,7 +32,7 @@ public:
 
     void addReadOffset(const size_t offset) { _readOffset += offset; }
 
-    std::string str() const
+    [[nodiscard]] std::string str() const
     {
         std::stringstream ss;
 
