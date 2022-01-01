@@ -22,7 +22,7 @@ public:
     virtual ~Client() = default;
     Client() = default;
 
-    Client(Client const&) = delete;
+    Client(const Client&) = delete;
     Client& operator=(const Client&) = delete;
 
     Client(Client&&) noexcept = default;
@@ -30,5 +30,6 @@ public:
 
     virtual void start(std::shared_ptr<net::Session> session) = 0;
     virtual void update() = 0;
+    [[nodiscard]] virtual bool aliveCheck() const = 0;
 };
 } // namespace mc

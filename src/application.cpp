@@ -49,7 +49,7 @@ void Application::mainloop()
     m_log->info("Enter mainloop");
     using namespace std::chrono_literals;
 
-    while(true)
+    while(!m_clients.empty())
     {
         utils::Timer timer;
 
@@ -63,6 +63,12 @@ void Application::mainloop()
         m_frameTime = timer.elapsed();
         m_apprunTime += m_frameTime;
         m_frameCounter += 1;
+
+        m_clients.erase(
+                m_clients.begin(),
+                std::remove_if(m_clients.begin(), m_clients.end(), [](auto& client) {
+                    return client->aliveCheck();
+                }));
     }
 }
 

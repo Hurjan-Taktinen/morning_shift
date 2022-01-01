@@ -27,6 +27,8 @@ add_project_arguments(
     ],
     language : ['cpp']
 )
+OPENSSL = subproject('openssl').get_variable('openssl_dep')
+JSON = subproject('nlohmann_json').get_variable('nlohmann_json_dep')
 
 subdir('data')
 subdir('include')

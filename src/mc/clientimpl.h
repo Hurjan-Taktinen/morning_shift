@@ -21,14 +21,15 @@ public:
 
     void start(std::shared_ptr<net::Session> session) override;
     void update() override;
+    bool aliveCheck() const override;
 
     void handleDisconnect(const std::string& reason) override;
-    void init(OwnerCbsPtr const& thisPtr);
+    void init(const OwnerCbsPtr& thisPtr);
 
 private:
-    void handleMessage(const mc::LoginSuccessMsg&) override;
-    void handleMessage(const mc::ChunkDataMsg&) override;
-    void handleMessage(const mc::BlockChangeMsg&) override;
+    void handleMessage(const mc::LoginSuccessMsg& msg) override;
+    void handleMessage(const mc::ChunkDataMsg& msg) override;
+    void handleMessage(const mc::BlockChangeMsg& msg) override;
 
     void login();
     void play();

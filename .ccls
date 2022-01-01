@@ -9,3 +9,5 @@ c++
 include/
 -I
 external/
+subprojects/spdlog-1.9.2/include/
+subprojects/nlohmann_json-3.9.1/include/

@@ -4,8 +4,11 @@
 
 #include "logs/log.h"
 
+#include <array>
+
 namespace mc
 {
+
 class Cartographer
 {
 public:
@@ -15,5 +18,6 @@ public:
 
 private:
     logs::Logger m_log;
+    std::unordered_map<uint64_t, uint16_t>  map;
 };
 } // namespace mc

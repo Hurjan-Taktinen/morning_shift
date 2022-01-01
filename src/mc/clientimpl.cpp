@@ -51,6 +51,11 @@ void ClientImpl::update()
     }
 }
 
+bool ClientImpl::aliveCheck() const
+{
+    return m_state != State::DISCONNECTED;
+}
+
 void ClientImpl::handleDisconnect(const std::string& reason)
 {
     m_state = State::DISCONNECTED;
