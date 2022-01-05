@@ -13,6 +13,5 @@ client = executable(
   sources : CLIENT_SOURCES,
   include_directories : INCLUDE_DIRS,
   link_with : [utils],
-  dependencies : [THREAD, BOOST, SPDLOG, ZLIB],
-  link_args : '-lfmt'
+  dependencies : [THREAD, BOOST, SPDLOG, ZLIB, FMT],
 )

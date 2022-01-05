@@ -20,6 +20,7 @@ SPDLOG = subproject('spdlog').get_variable('spdlog_dep')
 CATCH2 = subproject('catch2').get_variable('catch2_dep')
 ZLIB = subproject('zlib').get_variable('zlib_dep')
 THREAD = dependency('threads')
+FMT = dependency('fmt')
 
 add_project_arguments(
     [

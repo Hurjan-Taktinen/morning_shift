@@ -14,6 +14,11 @@ class Application final
 public:
     void run();
     ~Application();
+    Application() = default;
+    Application(Application const&) = default;
+    Application(Application &&) = default;
+    Application& operator=(Application const&) = default;
+    Application& operator=(Application &&) = default;
 
 private:
     void init();

@@ -16,3 +16,13 @@ test('varint',
     link_with: [utils],
   )
 )
+
+test('signals',
+  executable(
+    'signaltests',
+    ['signaling.cpp'],
+    include_directories : INCLUDE_DIRS,
+    dependencies : [CATCH2, FMT],
+    link_with: [utils],
+  )
+)
