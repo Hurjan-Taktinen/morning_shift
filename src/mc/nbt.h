@@ -2,9 +2,11 @@
 
 #include "stringarchive.h"
 
+#include <algorithm>
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <cstdint>
 
 #include <numeric>
 #include <concepts>
